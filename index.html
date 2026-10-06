@@ -1,0 +1,989 @@
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Herr Abo Ghalia - رحلة تعلم الألماني</title>
+  <!-- Google Fonts: Cairo & Fredoka for German/Arabic playful typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-cream: #FCF7EB;
+      --card-border: #163738;
+      --card-shadow: #0E2425;
+      --teal-main: #0B7077;
+      --teal-dark: #07474B;
+      --teal-light: #E1F3F3;
+      --gold: #FFBF42;
+      --orange: #FD7E14;
+    }
+
+    * {
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .font-latin {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      background-image: radial-gradient(#d3cbb7 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+      color: #163738;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 90px;
+    }
+
+    /* Chunky Neo-brutalist / Duolingo style button & card styles matching reference */
+    .neo-box {
+      background: #FFFFFF;
+      border: 3px solid var(--card-border);
+      border-radius: 28px;
+      box-shadow: 0 5px 0 var(--card-shadow);
+      position: relative;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .neo-box-teal {
+      background: #0B7077;
+      border: 3px solid var(--card-border);
+      border-radius: 28px;
+      box-shadow: 0 5px 0 var(--card-shadow);
+      color: #FFFFFF;
+    }
+
+    .neo-pill {
+      border: 2.2px solid var(--card-border);
+      border-radius: 9999px;
+      box-shadow: 0 3px 0 var(--card-shadow);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .neo-pill:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--card-shadow);
+    }
+
+    .neo-btn {
+      border: 2.5px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: 0 4px 0 var(--card-shadow);
+      transition: all 0.1s ease;
+      font-weight: 800;
+    }
+
+    .neo-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 var(--card-shadow);
+    }
+
+    /* German Flag mini component */
+    .german-flag {
+      width: 26px;
+      height: 18px;
+      border-radius: 4px;
+      overflow: hidden;
+      display: inline-flex;
+      flex-direction: column;
+      border: 1px solid #00000033;
+      flex-shrink: 0;
+    }
+    .flag-black { background: #000000; height: 33.33%; width: 100%; }
+    .flag-red { background: #DD0000; height: 33.33%; width: 100%; }
+    .flag-gold { background: #FFCE00; height: 33.33%; width: 100%; }
+
+    /* Circular Progress Bar */
+    .circle-bg {
+      fill: none;
+      stroke: #EAE3D2;
+      stroke-width: 10;
+    }
+    .circle-progress {
+      fill: none;
+      stroke: #0B7077;
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 220;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Active Tab indicator */
+    .nav-item.active {
+      background-color: var(--gold);
+      border: 2.2px solid var(--card-border);
+      box-shadow: 0 3px 0 var(--card-shadow);
+      border-radius: 18px;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c3beaf;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body class="antialiased selection:bg-amber-200">
+
+  <!-- Mobile Container Wrapper -->
+  <div class="w-full max-w-md mx-auto px-4 pt-3 flex flex-col gap-4">
+
+    <!-- TOP HEADER (Exact recreation of screenshot) -->
+    <header class="flex items-center justify-between py-2 px-1">
+      <!-- Left German Flag Icon Button -->
+      <button onclick="toggleAudioGreeting()" title="استمع للتحية الألمانية" class="w-12 h-12 bg-amber-400 border-[2.5px] border-[#163738] rounded-2xl shadow-[0_4px_0_#0E2425] flex items-center justify-center active:translate-y-1 active:shadow-none transition-all">
+        <div class="german-flag shadow-sm">
+          <div class="flag-black"></div>
+          <div class="flag-red"></div>
+          <div class="flag-gold"></div>
+        </div>
+      </button>
+
+      <!-- Streak Pill -->
+      <div id="streakBadge" onclick="showStreakDetails()" class="neo-pill bg-white px-3.5 py-1.5 flex items-center gap-1.5 cursor-pointer">
+        <span class="font-extrabold text-sm text-[#163738]" id="streakCount">7</span>
+        <span class="text-base">🔥</span>
+      </div>
+
+      <!-- Title & Slogan -->
+      <div class="text-center flex-1 mx-2">
+        <h1 class="font-black text-sm tracking-wide text-[#163738] font-latin uppercase">HERR ABO GHALIA</h1>
+        <p class="text-xs font-bold text-[#355B5C] flex items-center justify-center gap-1">
+          <span>🇩🇪</span>
+          <span>يلا نكمّل اللي بدأناه</span>
+        </p>
+      </div>
+
+      <!-- Right German Circular Emblem -->
+      <button onclick="openCourseModal()" title="إضافة كورس أو درس جديد" class="w-12 h-12 bg-[#0B7077] border-[2.5px] border-[#163738] rounded-2xl shadow-[0_4px_0_#0E2425] flex items-center justify-center active:translate-y-1 active:shadow-none transition-all">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+          <div class="german-flag scale-90 shadow-sm">
+            <div class="flag-black"></div>
+            <div class="flag-red"></div>
+            <div class="flag-gold"></div>
+          </div>
+        </div>
+      </button>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main id="tabContent" class="flex flex-col gap-4">
+      <!-- DYNAMIC CONTENT RENDERED BY TABS (DEFAULT: HOME) -->
+    </main>
+
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR (Exact replica from screenshot) -->
+  <nav class="fixed bottom-3 left-4 right-4 max-w-md mx-auto bg-white border-[3px] border-[#163738] rounded-[26px] shadow-[0_5px_0_#0E2425] py-1.5 px-2 z-40">
+    <div class="grid grid-cols-5 items-center justify-between text-center gap-1">
+      
+      <!-- حسابي (Profile) -->
+      <button onclick="switchTab('profile')" class="nav-item py-1 flex flex-col items-center justify-center transition-all" id="nav-profile">
+        <span class="text-xl">👨‍🎓</span>
+        <span class="text-[11px] font-extrabold text-[#163738] mt-0.5">حسابي</span>
+      </button>
+
+      <!-- إنجازاتي (Achievements) -->
+      <button onclick="switchTab('achievements')" class="nav-item py-1 flex flex-col items-center justify-center transition-all" id="nav-achievements">
+        <span class="text-xl">🏅</span>
+        <span class="text-[11px] font-extrabold text-[#163738] mt-0.5">إنجازاتي</span>
+      </button>
+
+      <!-- تقدمي (Analytics) -->
+      <button onclick="switchTab('stats')" class="nav-item py-1 flex flex-col items-center justify-center transition-all" id="nav-stats">
+        <span class="text-xl">📈</span>
+        <span class="text-[11px] font-extrabold text-[#163738] mt-0.5">تقدمي</span>
+      </button>
+
+      <!-- كورساتي (Courses) -->
+      <button onclick="switchTab('courses')" class="nav-item py-1 flex flex-col items-center justify-center transition-all" id="nav-courses">
+        <span class="text-xl">📚</span>
+        <span class="text-[11px] font-extrabold text-[#163738] mt-0.5">كورساتي</span>
+      </button>
+
+      <!-- الرئيسية (Home - Active) -->
+      <button onclick="switchTab('home')" class="nav-item active py-1 flex flex-col items-center justify-center transition-all" id="nav-home">
+        <span class="text-xl">🏠</span>
+        <span class="text-[11px] font-extrabold text-[#163738] mt-0.5">الرئيسية</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- QUICK ACTION / TIMER MODAL -->
+  <div id="studyModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 hidden px-4">
+    <div class="neo-box w-full max-w-sm p-5 bg-[#FCF7EB] animate-in fade-in zoom-in duration-200">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-black text-[#163738] flex items-center gap-2">
+          <span>⏱️</span>
+          <span>تسجيل وقت مذاكرة يا هير</span>
+        </h3>
+        <button onclick="closeModal('studyModal')" class="text-xl font-black text-gray-500 hover:text-red-500">✕</button>
+      </div>
+      <p class="text-xs text-gray-600 font-bold mb-4">كل دقيقة بتفرق في الطريق لـ B2 و C1! ضيف الوقت اللي قضيته دلوقتي:</p>
+      
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="addStudyMinutes(10)" class="neo-btn bg-white py-2 text-sm text-[#163738]">+10 دقائق</button>
+        <button onclick="addStudyMinutes(25)" class="neo-btn bg-amber-300 py-2 text-sm text-[#163738]">+25 دقيقة (بومودورو)</button>
+        <button onclick="addStudyMinutes(45)" class="neo-btn bg-teal-100 py-2 text-sm text-[#163738]">+45 دقيقة</button>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-[#163738] mb-1">أو أدخل الدقائق يدوي:</label>
+        <div class="flex gap-2">
+          <input type="number" id="customMinutesInput" placeholder="مثال: 20" min="1" max="300" class="flex-1 px-3 py-2 border-2 border-[#163738] rounded-xl font-bold text-center">
+          <button onclick="addCustomMinutes()" class="neo-btn bg-[#0B7077] text-white px-4 py-2">تسجيل</button>
+        </div>
+      </div>
+      
+      <button onclick="closeModal('studyModal')" class="w-full neo-btn bg-gray-200 py-2 text-xs text-gray-700">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- ADD LESSON / LECTURE MODAL -->
+  <div id="lessonModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 hidden px-4">
+    <div class="neo-box w-full max-w-sm p-5 bg-[#FCF7EB]">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-black text-[#163738]">➕ إضافة محاضرة أو كورس</h3>
+        <button onclick="closeModal('lessonModal')" class="text-xl font-black text-gray-500">✕</button>
+      </div>
+      
+      <form onsubmit="handleCreateLesson(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold mb-1">اسم المحاضرة أو الموضوع بالألماني / العربي:</label>
+          <input required id="newLessonTitle" type="text" placeholder="مثال: Akkusativ & Dativ Präpositionen" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl font-semibold text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">الكورس التابع له:</label>
+          <select id="newLessonCourse" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl font-bold text-sm bg-white">
+            <option value="A1.1 Grundstufe">A1.1 - كورس المبتدئين</option>
+            <option value="A2.2 Mittel">A2.2 - كورس المحادثة والقواعد</option>
+            <option value="B1 Vorbereitung">B1 - التحضير لامتحان جوته</option>
+            <option value="Präsentationen & Redemittel">Präsentationen & Redemittel</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">مدة المحاضرة المقدرة (بالدقائق):</label>
+          <input required id="newLessonDuration" type="number" value="35" min="5" max="180" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl font-bold text-sm">
+        </div>
+
+        <button type="submit" class="w-full neo-btn bg-[#0B7077] text-white py-2.5 mt-2 text-sm font-black">حفظ المحاضرة في الخطة 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FLASHCARD VOCABULARY MODAL -->
+  <div id="vocabModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 hidden px-4">
+    <div class="neo-box w-full max-w-sm p-5 bg-[#FCF7EB]">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-black text-[#163738]">🇩🇪 إضافة كلمة / جملة للمفردات</h3>
+        <button onclick="closeModal('vocabModal')" class="text-xl font-black text-gray-500">✕</button>
+      </div>
+      
+      <form onsubmit="handleCreateVocab(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold mb-1">الكلمة أو التعبير بالألماني (مع Artikel):</label>
+          <input required id="newVocabDe" dir="ltr" type="text" placeholder="z.B. Die Herausforderung / Es lohnt sich" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl font-bold text-sm font-latin">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">الترجمة بالمصري / الفصحى:</label>
+          <input required id="newVocabAr" type="text" placeholder="مثال: التحدي / الموضوع يستاهل التعب" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl font-bold text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold mb-1">مثال أو جملة توضيحية:</label>
+          <input id="newVocabEx" dir="ltr" type="text" placeholder="z.B. Deutsch lernen lohnt sich sehr!" class="w-full px-3 py-2 border-2 border-[#163738] rounded-xl text-xs font-latin">
+        </div>
+
+        <button type="submit" class="w-full neo-btn bg-amber-400 text-[#163738] py-2.5 mt-2 text-sm font-black">حفظ في كشكول هير أبو غالية 📝</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC & STORAGE ENGINE -->
+  <script>
+    // Initial State & Persistent Database in localStorage
+    const STORAGE_KEY = 'HERR_ABO_GHALIA_DATA_V2';
+
+    const defaultData = {
+      user: {
+        name: 'هير أبو غالية',
+        greetingTime: 'صباح الفل',
+        level: 'B1 Aspirant',
+        streak: 7,
+        targetDailyMinutes: 30,
+        todayLoggedMinutes: 25,
+        totalHours: 3,
+        totalMinutesExtra: 43,
+        totalCoursesCount: 6,
+        totalLectures: 50,
+        completedLectures: 11
+      },
+      currentResumeTopic: {
+        title: "تقديم عرض Presentation",
+        germanTitle: "Eine Präsentation halten",
+        sub: "Redemittel & Überleitungen für B1",
+        completed: false
+      },
+      courses: [
+        { id: 1, title: "A1.1 - أساسيات البداية مع هير أبو غالية", tag: "A1", lectures: 14, done: 14, color: "bg-emerald-100" },
+        { id: 2, title: "A2.2 - التراكيب القوية وحروف الجر المشتركة", tag: "A2", lectures: 16, done: 8, color: "bg-blue-100" },
+        { id: 3, title: "B1 - التحضير الشامل لامتحان Goethe & Telc", tag: "B1", lectures: 20, done: 3, color: "bg-amber-100" },
+        { id: 4, title: "فن التحدث والتعبير عن الرأي (Sprechen Pro)", tag: "Speaking", lectures: 10, done: 4, color: "bg-purple-100" }
+      ],
+      vocabList: [
+        { id: 1, de: "Der Erfolg", ar: "النجاح", example: "Erfolg ist kein Zufall (النجاح مش صدفة)", learned: true },
+        { id: 2, de: "Durchhalten", ar: "يصمد / يكمل للآخر", example: "Wir müssen durchhalten!", learned: true },
+        { id: 3, de: "Die Aussprache", ar: "طريقة النطق", example: "Die deutsche Aussprache ist leicht.", learned: false },
+        { id: 4, de: "Es lohnt sich", ar: "الموضوع يستاهل التعب", example: "Deutsch lernen lohnt sich für die Zukunft.", learned: true },
+        { id: 5, de: "Eine Präsentation halten", ar: "يلقي عرض تقديمي", example: "Morgen halte ich eine Präsentation.", learned: false }
+      ],
+      motivationalQuotes: [
+        "سجلت 25 دقيقة النهاردة، فاضل 5 وهتقفل الهدف 🎯",
+        "البداية هي كل حاجة.. كل يوم نص ساعة تصنع المعجزات في ألمانيا! 🇩🇪",
+        "الألماني مش صعب، الألماني محتاج استمرارية وصبر يا بطل 💪",
+        "فخور بيك يا هير.. الشغل الجامد ده هيوديك لمستوى عالي قريب جداً! 🚀"
+      ],
+      achievements: [
+        { id: 1, name: "بداية الأساطير", desc: "أول محاضرة تخلصها بنجاح", icon: "🌱", unlocked: true },
+        { id: 2, name: "أسبوع نار 🔥", desc: "استمرار 7 أيام متواصلة بدون انقطاع", icon: "🔥", unlocked: true },
+        { id: 3, name: "صانع القرارات", desc: "إتمام 10 محاضرات في كورس واحد", icon: "⚔️", unlocked: true },
+        { id: 4, name: "وحش المفردات", desc: "حفظ 50 كلمة ألمانية جديدة مع الأمثلة", icon: "🧠", unlocked: false },
+        { id: 5, name: "ماكينة B1", desc: "الوصول لـ 50% من إجمالي الرحلة", icon: "👑", unlocked: false }
+      ]
+    };
+
+    // Load or initialize state
+    function loadAppState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch(e) {
+          console.error("Local storage parse failed, using fallback:", e);
+        }
+      }
+      saveAppState(defaultData);
+      return defaultData;
+    }
+
+    function saveAppState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    let state = loadAppState();
+    let currentTab = 'home';
+
+    // UI Render Routines
+    function render() {
+      updateHeaderBadges();
+      const content = document.getElementById('tabContent');
+
+      if (currentTab === 'home') {
+        content.innerHTML = renderHomeHTML();
+        // Update circle animation after DOM insertion
+        setTimeout(updateProgressCircle, 50);
+      } else if (currentTab === 'courses') {
+        content.innerHTML = renderCoursesHTML();
+      } else if (currentTab === 'stats') {
+        content.innerHTML = renderStatsHTML();
+      } else if (currentTab === 'achievements') {
+        content.innerHTML = renderAchievementsHTML();
+      } else if (currentTab === 'profile') {
+        content.innerHTML = renderProfileHTML();
+      }
+    }
+
+    function updateHeaderBadges() {
+      document.getElementById('streakCount').innerText = state.user.streak;
+    }
+
+    // HOME TAB (Faithful to the visual reference)
+    function renderHomeHTML() {
+      const percent = Math.round((state.user.completedLectures / state.user.totalLectures) * 100);
+      const remainingMinutes = Math.max(0, state.user.targetDailyMinutes - state.user.todayLoggedMinutes);
+
+      return `
+        <!-- CARD 1: DAILY WELCOME & QUICK METRICS (As in screenshot) -->
+        <div class="neo-box p-5 pt-6 overflow-hidden">
+          <!-- Light decorative warm disk in corner like screenshot -->
+          <div class="absolute -top-6 -left-6 w-28 h-28 bg-[#FDECC8] rounded-full pointer-events-none opacity-80 -z-0"></div>
+
+          <div class="relative z-10">
+            <!-- Header Text with Sun -->
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="text-2xl font-black text-[#163738] flex items-center gap-2">
+                <span>صباح الفل يا هير أبو غالية</span>
+                <span class="text-2xl">☀️</span>
+              </h2>
+            </div>
+
+            <!-- Egyptian motivational subtext -->
+            <p class="text-sm font-bold text-[#355B5C] mb-4 leading-relaxed">
+              سجلت ${state.user.todayLoggedMinutes} دقيقة النهاردة، فاضل ${remainingMinutes} وهتقفل
+              <span class="inline-flex items-center gap-1 font-black text-[#0B7077]">الهدف 🎯</span>
+            </p>
+
+            <!-- 4 Badges Grid matching the reference screenshot layout -->
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+              
+              <!-- 11/50 محاضرة -->
+              <div onclick="openLessonProgressModal()" class="neo-pill bg-white px-3 py-2 flex items-center justify-center gap-1.5 cursor-pointer hover:bg-emerald-50 transition-colors">
+                <span class="font-extrabold text-sm text-[#163738] font-latin">${state.user.completedLectures}/${state.user.totalLectures}</span>
+                <span class="font-bold text-xs text-[#163738]">محاضرة</span>
+                <span class="text-sm">✅</span>
+              </div>
+
+              <!-- 6 كورس -->
+              <div onclick="switchTab('courses')" class="neo-pill bg-white px-3 py-2 flex items-center justify-center gap-1.5 cursor-pointer hover:bg-sky-50 transition-colors">
+                <span class="font-extrabold text-sm text-[#163738] font-latin">${state.courses.length}</span>
+                <span class="font-bold text-xs text-[#163738]">كورس</span>
+                <span class="text-sm">📚</span>
+              </div>
+
+              <!-- 7 يوم -->
+              <div onclick="boostStreak()" class="neo-pill bg-white px-3 py-2 flex items-center justify-center gap-1.5 cursor-pointer hover:bg-amber-50 transition-colors" title="اضغط لتثبيت وتفعيل الحماس!">
+                <span class="font-extrabold text-sm text-[#163738] font-latin">${state.user.streak}</span>
+                <span class="font-bold text-xs text-[#163738]">يوم</span>
+                <span class="text-sm">🔥</span>
+              </div>
+
+              <!-- 3س 43د -->
+              <div onclick="openStudyModal()" class="neo-pill bg-white px-3 py-2 flex items-center justify-center gap-1.5 cursor-pointer hover:bg-orange-50 transition-colors">
+                <span class="font-extrabold text-sm text-[#163738] font-latin">${state.user.totalHours}س ${state.user.totalMinutesExtra}د</span>
+                <span class="text-sm">⏱️</span>
+              </div>
+
+            </div>
+
+            <!-- Fast Action Row -->
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+              <button onclick="openStudyModal()" class="neo-btn flex-1 bg-amber-400 text-[#163738] py-2 text-xs flex items-center justify-center gap-1.5">
+                <span>⚡</span>
+                <span>سجّل وقت مذاكرة دلوقتي</span>
+              </button>
+              <button onclick="openVocabModal()" class="neo-btn bg-[#E1F3F3] text-[#0B7077] px-3.5 py-2 text-xs flex items-center justify-center gap-1" title="إضافة مفردات">
+                <span>🇩🇪</span>
+                <span>+ كلمة جديدة</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- CARD 2: JOURNEY & OVERALL PROGRESS (Matching reference with donut chart) -->
+        <div class="neo-box p-5">
+          <div class="flex items-center justify-between gap-3">
+            
+            <!-- Left Info & Rocket Bar -->
+            <div class="flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="text-lg font-black text-[#163738] flex items-center gap-1.5 mb-2">
+                  <span>رحلتك في الألماني</span>
+                  <span>🇩🇪</span>
+                </h3>
+
+                <p class="text-xs font-bold text-[#355B5C] leading-snug mb-4">
+                  ${state.user.completedLectures} محاضرة خلصت من إجمالي ${state.user.totalLectures}. البداية هي كل حاجة، استمر
+                </p>
+              </div>
+
+              <!-- Progress bar with gradient & rocket indicator -->
+              <div class="relative w-full pt-1 pb-1">
+                <div class="w-full bg-[#EAE3D2] h-4 rounded-full border-2 border-[#163738] overflow-hidden p-[1px]">
+                  <div class="bg-gradient-to-r from-amber-400 to-orange-500 h-full rounded-full transition-all duration-700" style="width: ${percent}%;"></div>
+                </div>
+                <!-- Mini rocket icon right by progress -->
+                <div class="text-xs absolute -bottom-2 transition-all duration-500" style="right: calc(${100 - percent}% - 8px)">
+                  🚀
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Circular Progress Ring (22% إجمالي) -->
+            <div class="relative w-28 h-28 flex-shrink-0 flex items-center justify-center">
+              <svg class="w-full h-full" viewBox="0 0 100 100">
+                <circle class="circle-bg" cx="50" cy="50" r="42" />
+                <circle id="svgCircle" class="circle-progress" cx="50" cy="50" r="42" />
+              </svg>
+
+              <!-- Center Text inside circle -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span class="text-2xl font-black text-[#163738] font-latin leading-tight" id="percentText">${percent}%</span>
+                <span class="text-[11px] font-bold text-gray-500">إجمالي</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- CARD 3: RESUME FROM WHERE YOU LEFT (Teal Neo Card) -->
+        <div class="neo-box-teal p-5 cursor-pointer transition-transform active:scale-[0.99]" onclick="toggleLectureCompletion()">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-amber-300 flex items-center gap-1">
+              <span>كمّل من حيث وقفت</span>
+              <span>👇</span>
+            </span>
+            <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">B1 Modul</span>
+          </div>
+
+          <h3 class="text-xl font-black tracking-wide text-white mb-0.5">
+            ${state.currentResumeTopic.title}
+          </h3>
+
+          <p class="text-sm font-semibold text-teal-100 font-latin mb-3" dir="ltr">
+            ${state.currentResumeTopic.germanTitle}
+          </p>
+
+          <div class="flex items-center justify-between pt-2 border-t border-white/20">
+            <span class="text-xs text-teal-100 font-medium">متبقي 12 دقيقة في هذا الدرس</span>
+            <button class="bg-amber-400 text-[#163738] px-3.5 py-1 rounded-xl text-xs font-black shadow-[0_2px_0_#0E2425]">
+              ${state.currentResumeTopic.completed ? 'أعد المشاهدة 🔄' : 'كمّل المحاضرة ▶️'}
+            </button>
+          </div>
+        </div>
+
+        <!-- QUICK VOCABULARY ACCORDION / SNIPPET -->
+        <div class="neo-box p-4 bg-[#FFFEFA]">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-extrabold text-sm text-[#163738] flex items-center gap-1.5">
+              <span>🧠</span>
+              <span>كلمة اليوم مع هير أبو غالية:</span>
+            </h4>
+            <button onclick="speakGerman('Das schaffen wir schon zusammen')" class="text-xs bg-amber-200 px-2.5 py-1 rounded-xl font-bold flex items-center gap-1 hover:bg-amber-300">
+              <span>🔊</span>
+              <span>نطق الجملة</span>
+            </button>
+          </div>
+          <div class="bg-amber-50/70 border-2 border-dashed border-amber-300 p-3 rounded-2xl">
+            <div class="flex justify-between items-center" dir="ltr">
+              <span class="font-black text-base text-[#163738] font-latin">„Das schaffen wir schon zusammen!“</span>
+            </div>
+            <p class="text-xs font-bold text-[#0B7077] mt-1" dir="rtl">
+              يعني: "هنعديها وهنوصل سوا يا هير.. متقلقش من الجراماتيك!" 🇪🇬🇩🇪
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    // COURSES TAB
+    function renderCoursesHTML() {
+      return `
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="text-xl font-black text-[#163738] flex items-center gap-2">
+            <span>📚</span>
+            <span>كورسات هير أبو غالية</span>
+          </h2>
+          <button onclick="openCourseModal()" class="neo-btn bg-[#0B7077] text-white text-xs px-3 py-1.5">+ إضافة كورس</button>
+        </div>
+
+        <div class="space-y-3">
+          ${state.courses.map(course => {
+            const coursePercent = Math.round((course.done / course.lectures) * 100);
+            return `
+              <div class="neo-box p-4 flex flex-col gap-2">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider bg-amber-300 border border-[#163738] px-2 py-0.5 rounded-md font-latin">${course.tag}</span>
+                    <h3 class="font-black text-base text-[#163738] mt-1">${course.title}</h3>
+                  </div>
+                  <button onclick="incrementCourseLesson(${course.id})" title="أنهيت محاضرة جديدة" class="neo-btn bg-emerald-400 text-xs px-2.5 py-1 text-[#163738]">
+                    + محاضرة ✅
+                  </button>
+                </div>
+
+                <div class="flex items-center justify-between text-xs font-bold text-gray-600 mt-1">
+                  <span>تم إنجاز: ${course.done} من ${course.lectures} محاضرة</span>
+                  <span class="font-latin font-black">${coursePercent}%</span>
+                </div>
+
+                <div class="w-full bg-[#EAE3D2] h-3 rounded-full border border-[#163738] overflow-hidden">
+                  <div class="bg-[#0B7077] h-full rounded-full transition-all duration-500" style="width: ${coursePercent}%;"></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- VOCABULARY SECTION INSIDE COURSES TAB -->
+        <div class="neo-box p-4 mt-2">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-black text-base text-[#163738] flex items-center gap-1.5">
+              <span>🗂️</span>
+              <span>كشكول الكلمات والقواعد</span>
+            </h3>
+            <button onclick="openVocabModal()" class="neo-btn bg-amber-400 text-xs px-2.5 py-1 text-[#163738]">+ كلمة جديدة</button>
+          </div>
+
+          <div class="divide-y divide-gray-200">
+            ${state.vocabList.map(v => `
+              <div class="py-2.5 flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-sm font-latin text-[#163738]" dir="ltr">${v.de}</span>
+                    <button onclick="speakGerman('${v.de.replace(/'/g, "\\'")}')" class="text-xs hover:scale-125 transition-transform" title="استمع للنطق">🔊</button>
+                  </div>
+                  <p class="text-xs font-bold text-[#0B7077]">${v.ar}</p>
+                  ${v.example ? `<p class="text-[11px] text-gray-500 font-latin" dir="ltr">${v.example}</p>` : ''}
+                </div>
+                <button onclick="deleteVocab(${v.id})" class="text-gray-400 hover:text-red-500 text-sm px-2">🗑️</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // STATS & PROGRESS TAB
+    function renderStatsHTML() {
+      const totalMinutes = (state.user.totalHours * 60) + state.user.totalMinutesExtra;
+      return `
+        <h2 class="text-xl font-black text-[#163738] flex items-center gap-2">
+          <span>📈</span>
+          <span>تحليلات تقدمك يا هير</span>
+        </h2>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="neo-box p-4 text-center">
+            <span class="text-2xl">🔥</span>
+            <div class="text-2xl font-black font-latin text-[#163738] mt-1">${state.user.streak} أيام</div>
+            <p class="text-xs font-bold text-gray-600">سلسلة الاستمرار (Streak)</p>
+          </div>
+
+          <div class="neo-box p-4 text-center">
+            <span class="text-2xl">⏱️</span>
+            <div class="text-2xl font-black font-latin text-[#163738] mt-1">${totalMinutes} دقيقة</div>
+            <p class="text-xs font-bold text-gray-600">إجمالي وقت المذاكرة</p>
+          </div>
+        </div>
+
+        <div class="neo-box p-4">
+          <h3 class="font-black text-base text-[#163738] mb-3">ساعات المذاكرة الأسبوعية (بالدقائق)</h3>
+          <!-- Interactive Bar chart simulation -->
+          <div class="flex items-end justify-between h-36 pt-4 px-2 border-b-2 border-[#163738]">
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">30د</span>
+              <div class="w-7 bg-teal-200 border-2 border-[#163738] rounded-t-lg h-16"></div>
+              <span class="text-[10px] font-bold">سبت</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">45د</span>
+              <div class="w-7 bg-teal-300 border-2 border-[#163738] rounded-t-lg h-24"></div>
+              <span class="text-[10px] font-bold">أحد</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">20د</span>
+              <div class="w-7 bg-teal-200 border-2 border-[#163738] rounded-t-lg h-12"></div>
+              <span class="text-[10px] font-bold">اثنين</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">60د</span>
+              <div class="w-7 bg-amber-400 border-2 border-[#163738] rounded-t-lg h-32"></div>
+              <span class="text-[10px] font-bold">ثلاثاء</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">40د</span>
+              <div class="w-7 bg-teal-400 border-2 border-[#163738] rounded-t-lg h-20"></div>
+              <span class="text-[10px] font-bold">أربعاء</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin">50د</span>
+              <div class="w-7 bg-teal-500 border-2 border-[#163738] rounded-t-lg h-28"></div>
+              <span class="text-[10px] font-bold">خميس</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold font-latin text-orange-600">${state.user.todayLoggedMinutes}د</span>
+              <div class="w-7 bg-orange-400 border-2 border-[#163738] rounded-t-lg h-16 animate-pulse"></div>
+              <span class="text-[10px] font-black text-[#163738]">الجمعة</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-2 font-bold text-center">أنت على بعد 5 دقائق فقط من تحقيق الهدف اليومي (30 دقيقة)!</p>
+        </div>
+      `;
+    }
+
+    // ACHIEVEMENTS TAB
+    function renderAchievementsHTML() {
+      return `
+        <h2 class="text-xl font-black text-[#163738] flex items-center gap-2">
+          <span>🏅</span>
+          <span>إنجازات وأوسمة هير أبو غالية</span>
+        </h2>
+        <p class="text-xs font-bold text-gray-600">كل خطوة بتعملها بتفتحلك وسام فخر ألماني 🇩🇪</p>
+
+        <div class="space-y-3 mt-2">
+          ${state.achievements.map(ach => `
+            <div class="neo-box p-4 flex items-center gap-4 ${ach.unlocked ? 'bg-white' : 'bg-gray-100 opacity-60'}">
+              <div class="w-14 h-14 rounded-2xl border-2 border-[#163738] ${ach.unlocked ? 'bg-amber-300' : 'bg-gray-300'} flex items-center justify-center text-3xl shadow-[0_3px_0_#0E2425]">
+                ${ach.icon}
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-black text-sm text-[#163738]">${ach.name}</h3>
+                  ${ach.unlocked ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-500">تم الفتح 🔓</span>' : '<span class="text-[10px] bg-gray-200 text-gray-600 font-bold px-2 py-0.5 rounded-full">قيد الإنجاز 🔒</span>'}
+                </div>
+                <p class="text-xs font-bold text-[#355B5C] mt-1">${ach.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // PROFILE TAB
+    function renderProfileHTML() {
+      return `
+        <div class="neo-box p-5 text-center">
+          <div class="w-20 h-20 mx-auto rounded-full bg-amber-300 border-4 border-[#163738] flex items-center justify-center text-4xl shadow-[0_4px_0_#0E2425] mb-3">
+            👨‍🏫
+          </div>
+          <h2 class="text-2xl font-black text-[#163738]">${state.user.name}</h2>
+          <p class="text-xs font-bold text-[#0B7077] mt-0.5">المستوى الحالي: B1 Deutsch Champion 🇩🇪</p>
+          <div class="neo-pill inline-flex px-4 py-1 bg-amber-100 mt-2 font-bold text-xs text-[#163738]">
+            "يلا نكمّل اللي بدأناه"
+          </div>
+        </div>
+
+        <div class="neo-box p-5 space-y-4">
+          <h3 class="font-black text-base text-[#163738]">إعدادات الرحلة والبيانات</h3>
+          
+          <div>
+            <label class="block text-xs font-bold mb-1">الهدف اليومي للمذاكرة (بالدقائق):</label>
+            <div class="flex gap-2">
+              <input id="dailyTargetSetting" type="number" value="${state.user.targetDailyMinutes}" class="flex-1 px-3 py-2 border-2 border-[#163738] rounded-xl font-bold">
+              <button onclick="updateDailyTarget()" class="neo-btn bg-[#0B7077] text-white px-4 text-xs">حفظ</button>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-gray-200 flex flex-col gap-2">
+            <button onclick="triggerConfetti()" class="neo-btn bg-amber-400 text-[#163738] py-2.5 text-xs font-extrabold flex items-center justify-center gap-1.5">
+              <span>🎉</span>
+              <span>احتفل بإنجاز النهاردة!</span>
+            </button>
+
+            <button onclick="resetDataToFactory()" class="neo-btn bg-rose-100 text-rose-700 py-2.5 text-xs font-extrabold border-rose-800">
+              ⚠️ إعادة ضبط بيانات التطبيق
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // DYNAMIC SVG PROGRESS CIRCLE ANIMATION
+    function updateProgressCircle() {
+      const circle = document.getElementById('svgCircle');
+      if (!circle) return;
+      const percent = Math.min(100, Math.round((state.user.completedLectures / state.user.totalLectures) * 100));
+      const circumference = 2 * Math.PI * 42; // ~263.89
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    // ACTIONS & CONTROLLERS
+    function switchTab(tabName) {
+      currentTab = tabName;
+      // Update nav styling
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const activeNavBtn = document.getElementById('nav-' + tabName);
+      if (activeNavBtn) activeNavBtn.classList.add('active');
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openStudyModal() {
+      document.getElementById('studyModal').classList.remove('hidden');
+    }
+
+    function openCourseModal() {
+      document.getElementById('lessonModal').classList.remove('hidden');
+    }
+
+    function openVocabModal() {
+      document.getElementById('vocabModal').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function addStudyMinutes(mins) {
+      state.user.todayLoggedMinutes += mins;
+      state.user.totalMinutesExtra += mins;
+      if (state.user.totalMinutesExtra >= 60) {
+        state.user.totalHours += Math.floor(state.user.totalMinutesExtra / 60);
+        state.user.totalMinutesExtra = state.user.totalMinutesExtra % 60;
+      }
+      saveAppState(state);
+      closeModal('studyModal');
+      render();
+      triggerConfetti();
+    }
+
+    function addCustomMinutes() {
+      const val = parseInt(document.getElementById('customMinutesInput').value, 10);
+      if (!isNaN(val) && val > 0) {
+        addStudyMinutes(val);
+      }
+    }
+
+    function toggleLectureCompletion() {
+      state.currentResumeTopic.completed = !state.currentResumeTopic.completed;
+      if (state.currentResumeTopic.completed) {
+        state.user.completedLectures = Math.min(state.user.totalLectures, state.user.completedLectures + 1);
+        triggerConfetti();
+      } else {
+        state.user.completedLectures = Math.max(0, state.user.completedLectures - 1);
+      }
+      saveAppState(state);
+      render();
+    }
+
+    function incrementCourseLesson(courseId) {
+      const c = state.courses.find(item => item.id === courseId);
+      if (c && c.done < c.lectures) {
+        c.done += 1;
+        state.user.completedLectures = Math.min(state.user.totalLectures, state.user.completedLectures + 1);
+        saveAppState(state);
+        render();
+        triggerConfetti();
+      }
+    }
+
+    function handleCreateLesson(e) {
+      e.preventDefault();
+      const title = document.getElementById('newLessonTitle').value;
+      const course = document.getElementById('newLessonCourse').value;
+      const duration = parseInt(document.getElementById('newLessonDuration').value, 10);
+
+      state.currentResumeTopic.title = title;
+      state.currentResumeTopic.germanTitle = course;
+      state.user.totalLectures += 1;
+      
+      saveAppState(state);
+      closeModal('lessonModal');
+      render();
+    }
+
+    function handleCreateVocab(e) {
+      e.preventDefault();
+      const de = document.getElementById('newVocabDe').value;
+      const ar = document.getElementById('newVocabAr').value;
+      const ex = document.getElementById('newVocabEx').value;
+
+      state.vocabList.unshift({
+        id: Date.now(),
+        de,
+        ar,
+        example: ex,
+        learned: false
+      });
+
+      saveAppState(state);
+      closeModal('vocabModal');
+      render();
+    }
+
+    function deleteVocab(id) {
+      state.vocabList = state.vocabList.filter(v => v.id !== id);
+      saveAppState(state);
+      render();
+    }
+
+    function boostStreak() {
+      state.user.streak += 1;
+      saveAppState(state);
+      render();
+      triggerConfetti();
+    }
+
+    function showStreakDetails() {
+      alert(`عاش يا هير! أنت محافظ على مذاكرتك بقالك ${state.user.streak} أيام ورا بعض! استمر ولا تقطع السلسلة 🔥`);
+    }
+
+    function openLessonProgressModal() {
+      const more = prompt("عدل عدد المحاضرات المكتملة:", state.user.completedLectures);
+      if (more !== null && !isNaN(parseInt(more, 10))) {
+        state.user.completedLectures = parseInt(more, 10);
+        saveAppState(state);
+        render();
+      }
+    }
+
+    function updateDailyTarget() {
+      const input = document.getElementById('dailyTargetSetting');
+      const val = parseInt(input.value, 10);
+      if (val > 0) {
+        state.user.targetDailyMinutes = val;
+        saveAppState(state);
+        alert("تم تحديث الهدف اليومي بنجاح يا هير!");
+        render();
+      }
+    }
+
+    function resetDataToFactory() {
+      if (confirm("هل تريد استعادة البيانات الافتراضية للتطبيق؟")) {
+        localStorage.removeItem(STORAGE_KEY);
+        state = JSON.parse(JSON.stringify(defaultData));
+        saveAppState(state);
+        render();
+      }
+    }
+
+    // German Speech Synthesis Web API
+    function speakGerman(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'de-DE';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("متصفحك لا يدعم نطق الصوت التلقائي.");
+      }
+    }
+
+    function toggleAudioGreeting() {
+      speakGerman("Guten Morgen, Herr Abo Ghalia! Lass uns weitermachen!");
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          origin: { y: 0.7 },
+          colors: ['#0B7077', '#FFBF42', '#FD7E14', '#163738']
+        });
+      }
+    }
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+      render();
+    });
+  </script>
+</body>
+</html>
